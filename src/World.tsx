@@ -7,7 +7,7 @@ import * as THREE from 'three'
 import { scrollState } from './scrollState'
 
 const KEYFRAMES = [
-  { pos: [0, 3, 12]   as [number,number,number], target: [0, 0, 0]    as [number,number,number], fov: 60 },
+  { pos: [0, 2, 16]   as [number,number,number], target: [3, 0, 0]    as [number,number,number], fov: 55 },
   { pos: [5, 4, 4]    as [number,number,number], target: [0, 0, -8]   as [number,number,number], fov: 70 },
   { pos: [0, 2, -8]   as [number,number,number], target: [0, 0, -15]  as [number,number,number], fov: 55 },
   { pos: [-8, 4, -25] as [number,number,number], target: [0, 0, -30]  as [number,number,number], fov: 60 },
@@ -54,7 +54,7 @@ function BlinkingLight({ position, color }: { position: [number,number,number], 
   return (
     <mesh position={position}>
       <sphereGeometry args={[0.08, 8, 8]} />
-      <meshStandardMaterial ref={ref} color={color} emissive={color} emissiveIntensity={2} />
+      <meshStandardMaterial ref={ref} color={color} emissive={color} emissiveIntensity={4} />
     </mesh>
   )
 }
@@ -73,7 +73,7 @@ function SensorTower({ position }: { position: [number,number,number] }) {
       {([-1, 0, 1, 2] as number[]).map((y, i) => (
         <mesh key={i} position={[0, y, 0]}>
           <torusGeometry args={[0.6, 0.05, 8, 32]} />
-          <meshStandardMaterial color="#06b6d4" emissive="#06b6d4" emissiveIntensity={1.2} />
+          <meshStandardMaterial color="#06b6d4" emissive="#06b6d4" emissiveIntensity={2.5} />
         </mesh>
       ))}
       <mesh position={[0, 3.2, 0]}>
@@ -115,7 +115,8 @@ export default function World() {
         />
       </mesh>
 
-      <group position={[4, 0, -2]} scale={1.3}><SensorTower position={[0, 0, 0]} /></group>
+      <group position={[5, 0, -3]} scale={1.8}><SensorTower position={[0, 0, 0]} /></group>
+      <pointLight position={[5, 2, -3]} color="#06b6d4" intensity={3} distance={12} />
       <CNCMachine position={[0, 0, -15]} />
       <ConveyorBelt position={[0, -2.8, -30]} />
       <DataPipeline position={[0, 0, -45]} />
