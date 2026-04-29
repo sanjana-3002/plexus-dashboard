@@ -115,7 +115,48 @@ export default function World() {
 
       <SensorTower position={[0, 0, 0]} />
       <CNCMachine position={[0, 0, -15]} />
+      <ConveyorBelt position={[0, -2.8, -30]} />
     </>
+  )
+}
+
+function ConveyorBelt({ position }: { position: [number,number,number] }) {
+  const productRef = useRef<THREE.Group>(null)
+  useFrame(({ clock }) => {
+    if (productRef.current) {
+      productRef.current.children.forEach((child, i) => {
+        const mesh = child as THREE.Mesh
+        mesh.position.x = ((((i - 1) * 2) + clock.elapsedTime * 0.5) % 6) - 3
+      })
+    }
+  })
+  return (
+    <group position={position}>
+      <mesh>
+        <boxGeometry args={[8, 0.2, 1.5]} />
+        <meshStandardMaterial color="#1e293b" metalness={0.6} roughness={0.4} />
+      </mesh>
+      {([-3, 0, 3] as number[]).map((x, i) => (
+        <mesh key={i} position={[x, -1, 0]}>
+          <boxGeometry args={[0.2, 2, 0.2]} />
+          <meshStandardMaterial color="#334155" metalness={0.8} roughness={0.3} />
+        </mesh>
+      ))}
+      <group ref={productRef}>
+        {([0, 1, 2] as number[]).map((i) => (
+          <mesh key={i} position={[(i - 1) * 2, 0.3, 0]}>
+            <boxGeometry args={[0.6, 0.4, 0.6]} />
+            <meshStandardMaterial
+              color={i === 1 ? '#f97316' : '#475569'}
+              metalness={0.3}
+              roughness={0.6}
+            />
+          </mesh>
+        ))}
+      </group>
+      <BlinkingLight position={[0, 0.9, 0]} color="#ef4444" />
+      <pointLight position={[0, 1, 0]} color="#ef4444" intensity={0.5} distance={4} />
+    </group>
   )
 }
 
