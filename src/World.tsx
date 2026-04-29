@@ -114,6 +114,41 @@ export default function World() {
       </mesh>
 
       <SensorTower position={[0, 0, 0]} />
+      <CNCMachine position={[0, 0, -15]} />
     </>
+  )
+}
+
+function CNCMachine({ position }: { position: [number,number,number] }) {
+  const armRef = useRef<THREE.Mesh>(null)
+  useFrame(({ clock }) => {
+    if (armRef.current) armRef.current.rotation.z = Math.sin(clock.elapsedTime * 0.5) * 0.3
+  })
+  return (
+    <group position={position}>
+      <mesh position={[0, -1, 0]}>
+        <boxGeometry args={[4, 2, 3]} />
+        <meshStandardMaterial color="#1e293b" metalness={0.9} roughness={0.2} />
+      </mesh>
+      <mesh position={[0, 1, 0]}>
+        <boxGeometry args={[3, 2, 2.5]} />
+        <meshStandardMaterial color="#0f172a" metalness={0.95} roughness={0.1} />
+      </mesh>
+      <mesh ref={armRef} position={[0, 2.5, 0]}>
+        <boxGeometry args={[0.3, 1.5, 0.3]} />
+        <meshStandardMaterial color="#334155" metalness={0.9} roughness={0.2} />
+      </mesh>
+      {([-1.5, 1.5] as number[]).map((x, i) => (
+        <mesh key={i} position={[x, 1, 1.3]}>
+          <boxGeometry args={[0.05, 1.5, 0.05]} />
+          <meshStandardMaterial color="#06b6d4" emissive="#06b6d4" emissiveIntensity={1} />
+        </mesh>
+      ))}
+      <mesh position={[0, 0, 1.51]}>
+        <boxGeometry args={[4, 0.15, 0.02]} />
+        <meshStandardMaterial color="#f97316" emissive="#f97316" emissiveIntensity={0.8} />
+      </mesh>
+      <pointLight position={[0, 2, 0]} color="#06b6d4" intensity={1} distance={6} />
+    </group>
   )
 }
