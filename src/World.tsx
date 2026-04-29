@@ -1,8 +1,53 @@
+import { useRef } from 'react'
+import { useFrame, useThree } from '@react-three/fiber'
 import { MeshReflectorMaterial } from '@react-three/drei'
+import * as THREE from 'three'
+import { scrollState } from './scrollState'
+
+const KEYFRAMES = [
+  { pos: [0, 3, 12]   as [number,number,number], target: [0, 0, 0]    as [number,number,number], fov: 60 },
+  { pos: [8, 6, 8]    as [number,number,number], target: [0, 0, -5]   as [number,number,number], fov: 70 },
+  { pos: [0, 2, -8]   as [number,number,number], target: [0, 0, -15]  as [number,number,number], fov: 55 },
+  { pos: [-8, 4, -25] as [number,number,number], target: [0, 0, -30]  as [number,number,number], fov: 60 },
+  { pos: [3, 1, -38]  as [number,number,number], target: [0, 0, -45]  as [number,number,number], fov: 65 },
+  { pos: [0, 12, -20] as [number,number,number], target: [0, -3, -30] as [number,number,number], fov: 75 },
+]
+
+function CameraController() {
+  const { camera } = useThree()
+  const lookTarget = useRef(new THREE.Vector3())
+
+  useFrame(() => {
+    const progress = scrollState.progress
+    const total = KEYFRAMES.length - 1
+    const sp = Math.min(progress * total, total - 0.0001)
+    const idx = Math.floor(sp)
+    const t = sp - idx
+    const from = KEYFRAMES[idx]
+    const to = KEYFRAMES[Math.min(idx + 1, total)]
+
+    camera.position.set(
+      THREE.MathUtils.lerp(from.pos[0], to.pos[0], t),
+      THREE.MathUtils.lerp(from.pos[1], to.pos[1], t),
+      THREE.MathUtils.lerp(from.pos[2], to.pos[2], t),
+    )
+    lookTarget.current.set(
+      THREE.MathUtils.lerp(from.target[0], to.target[0], t),
+      THREE.MathUtils.lerp(from.target[1], to.target[1], t),
+      THREE.MathUtils.lerp(from.target[2], to.target[2], t),
+    )
+    camera.lookAt(lookTarget.current)
+    ;(camera as THREE.PerspectiveCamera).fov = THREE.MathUtils.lerp(from.fov, to.fov, t)
+    ;(camera as THREE.PerspectiveCamera).updateProjectionMatrix()
+  })
+
+  return null
+}
 
 export default function World() {
   return (
     <>
+      <CameraController />
       <fog attach="fog" args={['#020912', 18, 120]} />
 
       <ambientLight intensity={0.1} />
