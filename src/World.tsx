@@ -8,10 +8,10 @@ import { scrollState } from './scrollState'
 
 const KEYFRAMES = [
   { pos: [0, 3, 12]   as [number,number,number], target: [0, 0, 0]    as [number,number,number], fov: 60 },
-  { pos: [8, 6, 8]    as [number,number,number], target: [0, 0, -5]   as [number,number,number], fov: 70 },
+  { pos: [5, 4, 4]    as [number,number,number], target: [0, 0, -8]   as [number,number,number], fov: 70 },
   { pos: [0, 2, -8]   as [number,number,number], target: [0, 0, -15]  as [number,number,number], fov: 55 },
   { pos: [-8, 4, -25] as [number,number,number], target: [0, 0, -30]  as [number,number,number], fov: 60 },
-  { pos: [3, 1, -38]  as [number,number,number], target: [0, 0, -45]  as [number,number,number], fov: 65 },
+  { pos: [0, 3, -35]  as [number,number,number], target: [0, -1, -45] as [number,number,number], fov: 65 },
   { pos: [0, 12, -20] as [number,number,number], target: [0, -3, -30] as [number,number,number], fov: 75 },
 ]
 
@@ -115,7 +115,7 @@ export default function World() {
         />
       </mesh>
 
-      <SensorTower position={[0, 0, 0]} />
+      <group position={[4, 0, -2]} scale={1.3}><SensorTower position={[0, 0, 0]} /></group>
       <CNCMachine position={[0, 0, -15]} />
       <ConveyorBelt position={[0, -2.8, -30]} />
       <DataPipeline position={[0, 0, -45]} />

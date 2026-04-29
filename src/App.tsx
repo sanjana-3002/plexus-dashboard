@@ -121,7 +121,7 @@ export default function App() {
         {/* Section 3 — SafetyEye */}
         <div style={{ height: '100vh' }}>
           <div className="overlay right">
-            <span className="product-name">SafetyEye</span>
+            <span className="product-name" style={{ fontSize: 'clamp(72px, 9vw, 120px)' }}>SafetyEye</span>
             <p className="tagline">
               The camera is already there.<br />It just wasn't watching.
             </p>
@@ -133,7 +133,10 @@ export default function App() {
         {/* Section 4 — MachineWhisperer */}
         <div style={{ height: '100vh' }}>
           <div className="overlay left">
-            <span className="product-name">MachineWhisperer</span>
+            <span className="product-name" style={{ fontSize: 'clamp(56px, 7vw, 96px)' }}>MachineWhisperer</span>
+            <p style={{ fontSize: '20px', fontWeight: 300, color: '#94a3b8', lineHeight: 1.6, marginBottom: '24px' }}>
+              Five years of machine history.<br />Answered in 30 seconds.
+            </p>
             <div className="terminal">
               <span className="query">Has this vibration appeared before?</span>
               <span className="response">
@@ -186,7 +189,24 @@ export default function App() {
             }}>
               You just can't hear it yet.
             </h2>
-            <a className="cta-btn" href="mailto:hello@sensoris.ai">
+            <a
+              href="mailto:hello@sensoris.ai"
+              style={{
+                display: 'inline-block',
+                marginTop: '32px',
+                fontSize: '18px',
+                fontWeight: 400,
+                color: '#06b6d4',
+                textDecoration: 'none',
+                borderBottom: '1px solid rgba(6,182,212,0.4)',
+                paddingBottom: '4px',
+                cursor: 'pointer',
+                transition: 'border-color 0.2s',
+                pointerEvents: 'all',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.borderColor = '#06b6d4')}
+              onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(6,182,212,0.4)')}
+            >
               Request early access →
             </a>
             <p className="muted">Starting in Chicago · Expanding to 10 facilities in 2026</p>
