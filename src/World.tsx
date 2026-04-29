@@ -1,6 +1,8 @@
 import { useRef, useMemo } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { MeshReflectorMaterial, Line } from '@react-three/drei'
+import { EffectComposer, Bloom, ChromaticAberration, Vignette, Noise } from '@react-three/postprocessing'
+import { BlendFunction } from 'postprocessing'
 import * as THREE from 'three'
 import { scrollState } from './scrollState'
 
@@ -122,6 +124,16 @@ export default function World() {
       <DataStream from={[2, 0, 0]}    to={[2, 0, -15]}   color="#06b6d4" />
       <DataStream from={[-2, 0, -15]} to={[-2, 0, -30]}  color="#f59e0b" />
       <DataStream from={[0, 2, -30]}  to={[0, 2, -45]}   color="#d946ef" />
+
+      <EffectComposer>
+        <Bloom intensity={1.2} luminanceThreshold={0.3} luminanceSmoothing={0.9} mipmapBlur />
+        <ChromaticAberration
+          blendFunction={BlendFunction.NORMAL}
+          offset={new THREE.Vector2(0.0005, 0.0005) as any}
+        />
+        <Vignette eskil={false} offset={0.1} darkness={1.1} />
+        <Noise opacity={0.03} />
+      </EffectComposer>
     </>
   )
 }
