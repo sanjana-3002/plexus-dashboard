@@ -1,6 +1,6 @@
 import { useRef, useMemo } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import { MeshReflectorMaterial } from '@react-three/drei'
+import { MeshReflectorMaterial, Line } from '@react-three/drei'
 import * as THREE from 'three'
 import { scrollState } from './scrollState'
 
@@ -118,7 +118,36 @@ export default function World() {
       <ConveyorBelt position={[0, -2.8, -30]} />
       <DataPipeline position={[0, 0, -45]} />
       <ParticleField />
+
+      <DataStream from={[2, 0, 0]}    to={[2, 0, -15]}   color="#06b6d4" />
+      <DataStream from={[-2, 0, -15]} to={[-2, 0, -30]}  color="#f59e0b" />
+      <DataStream from={[0, 2, -30]}  to={[0, 2, -45]}   color="#d946ef" />
     </>
+  )
+}
+
+function DataStream({ from, to, color }: {
+  from: [number,number,number]
+  to: [number,number,number]
+  color: string
+}) {
+  const lineRef = useRef<any>(null)
+  useFrame(() => {
+    if (lineRef.current?.material) {
+      (lineRef.current.material as any).dashOffset -= 0.005
+    }
+  })
+  return (
+    <Line
+      ref={lineRef}
+      points={[from, to]}
+      color={color}
+      lineWidth={1}
+      dashed
+      dashScale={2}
+      dashSize={0.5}
+      gapSize={0.3}
+    />
   )
 }
 
