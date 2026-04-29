@@ -44,6 +44,46 @@ function CameraController() {
   return null
 }
 
+function BlinkingLight({ position, color }: { position: [number,number,number], color: string }) {
+  const ref = useRef<THREE.MeshStandardMaterial>(null)
+  useFrame(({ clock }) => {
+    if (ref.current) ref.current.emissiveIntensity = 1.5 + Math.sin(clock.elapsedTime * 4) * 1.5
+  })
+  return (
+    <mesh position={position}>
+      <sphereGeometry args={[0.08, 8, 8]} />
+      <meshStandardMaterial ref={ref} color={color} emissive={color} emissiveIntensity={2} />
+    </mesh>
+  )
+}
+
+function SensorTower({ position }: { position: [number,number,number] }) {
+  const ref = useRef<THREE.Group>(null)
+  useFrame(({ clock }) => {
+    if (ref.current) ref.current.rotation.y = clock.elapsedTime * 0.1
+  })
+  return (
+    <group ref={ref} position={position}>
+      <mesh>
+        <cylinderGeometry args={[0.3, 0.5, 6, 16]} />
+        <meshStandardMaterial color="#1e293b" metalness={0.95} roughness={0.1} />
+      </mesh>
+      {([-1, 0, 1, 2] as number[]).map((y, i) => (
+        <mesh key={i} position={[0, y, 0]}>
+          <torusGeometry args={[0.6, 0.05, 8, 32]} />
+          <meshStandardMaterial color="#06b6d4" emissive="#06b6d4" emissiveIntensity={1.2} />
+        </mesh>
+      ))}
+      <mesh position={[0, 3.2, 0]}>
+        <sphereGeometry args={[0.4, 16, 16]} />
+        <meshStandardMaterial color="#0f172a" metalness={1} roughness={0.05} />
+      </mesh>
+      <BlinkingLight position={[0, 3.7, 0]} color="#22c55e" />
+      <pointLight color="#06b6d4" intensity={1.5} distance={8} />
+    </group>
+  )
+}
+
 export default function World() {
   return (
     <>
@@ -72,6 +112,8 @@ export default function World() {
           metalness={0.8}
         />
       </mesh>
+
+      <SensorTower position={[0, 0, 0]} />
     </>
   )
 }
