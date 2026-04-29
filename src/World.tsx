@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useMemo } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { MeshReflectorMaterial } from '@react-three/drei'
 import * as THREE from 'three'
@@ -116,7 +116,76 @@ export default function World() {
       <SensorTower position={[0, 0, 0]} />
       <CNCMachine position={[0, 0, -15]} />
       <ConveyorBelt position={[0, -2.8, -30]} />
+      <DataPipeline position={[0, 0, -45]} />
+      <ParticleField />
     </>
+  )
+}
+
+function DataPipeline({ position }: { position: [number,number,number] }) {
+  const count = 120
+  const { particleGeo, posAttr } = useMemo(() => {
+    const g = new THREE.BufferGeometry()
+    const pos = new Float32Array(count * 3)
+    for (let i = 0; i < count; i++) {
+      pos[i * 3]     = (Math.random() - 0.5) * 0.3
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 0.3
+      pos[i * 3 + 2] = (i / count) * 10 - 5
+    }
+    const attr = new THREE.BufferAttribute(pos, 3)
+    g.setAttribute('position', attr)
+    return { particleGeo: g, posAttr: attr }
+  }, [])
+
+  useFrame(({ clock }) => {
+    const arr = posAttr.array as Float32Array
+    for (let i = 0; i < count; i++) {
+      const baseZ = (i / count) * 10 - 5
+      arr[i * 3 + 2] = ((baseZ + 5 + clock.elapsedTime * 2) % 10) - 5
+    }
+    posAttr.needsUpdate = true
+  })
+
+  return (
+    <group position={position}>
+      {([[- 1, 0], [0, 0.5], [1, 0]] as [number,number][]).map(([x, y], i) => (
+        <mesh key={i} position={[x, y, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.08, 0.08, 10, 8, 1, true]} />
+          <meshStandardMaterial color="#0f172a" metalness={0.9} roughness={0.1}
+            transparent opacity={0.5} side={THREE.DoubleSide} />
+        </mesh>
+      ))}
+      <points geometry={particleGeo}>
+        <pointsMaterial color="#06b6d4" size={0.07} transparent opacity={0.9} sizeAttenuation />
+      </points>
+      <pointLight color="#06b6d4" intensity={1} distance={8} />
+    </group>
+  )
+}
+
+function ParticleField() {
+  const count = 2000
+  const geo = useMemo(() => {
+    const g = new THREE.BufferGeometry()
+    const pos = new Float32Array(count * 3)
+    for (let i = 0; i < count; i++) {
+      pos[i * 3]     = (Math.random() - 0.5) * 80
+      pos[i * 3 + 1] = Math.random() * 20 - 5
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 120
+    }
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3))
+    return g
+  }, [])
+
+  const ref = useRef<THREE.Points>(null)
+  useFrame(({ clock }) => {
+    if (ref.current) ref.current.rotation.y = clock.elapsedTime * 0.005
+  })
+
+  return (
+    <points ref={ref} geometry={geo}>
+      <pointsMaterial color="#1d4ed8" size={0.06} transparent opacity={0.4} sizeAttenuation />
+    </points>
   )
 }
 
