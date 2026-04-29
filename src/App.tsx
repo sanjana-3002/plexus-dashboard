@@ -3,6 +3,7 @@ import { Canvas } from '@react-three/fiber'
 import { ACESFilmicToneMapping } from 'three'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import Lenis from 'lenis'
 import { scrollState } from './scrollState'
 import World from './World'
 import './index.css'
@@ -11,6 +12,18 @@ gsap.registerPlugin(ScrollTrigger)
 
 export default function App() {
   useEffect(() => {
+    // Smooth scroll via Lenis
+    const lenis = new Lenis({
+      duration: 1.4,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    })
+
+    const tickerFn = (time: number) => lenis.raf(time * 1000)
+    gsap.ticker.add(tickerFn)
+    gsap.ticker.lagSmoothing(0)
+    lenis.on('scroll', ScrollTrigger.update)
+
+    // ScrollTrigger reads progress 0→1 as user scrolls through the 600vh container
     const trigger = ScrollTrigger.create({
       trigger: '#scroll-container',
       start: 'top top',
@@ -19,12 +32,20 @@ export default function App() {
         scrollState.progress = self.progress
       },
     })
-    setTimeout(() => ScrollTrigger.refresh(), 300)
-    return () => trigger.kill()
+
+    const refreshTimer = setTimeout(() => ScrollTrigger.refresh(), 300)
+
+    return () => {
+      clearTimeout(refreshTimer)
+      trigger.kill()
+      lenis.destroy()
+      gsap.ticker.remove(tickerFn)
+    }
   }, [])
 
   return (
     <>
+      {/* ── Fixed Three.js world — never scrolls ── */}
       <div style={{ position: 'fixed', inset: 0, zIndex: 0 }}>
         <Canvas
           style={{ pointerEvents: 'none' }}
@@ -36,9 +57,10 @@ export default function App() {
         </Canvas>
       </div>
 
+      {/* ── Scroll container — 600vh, text overlays float here ── */}
       <div id="scroll-container" style={{ position: 'relative', zIndex: 10, height: '600vh' }}>
 
-        {/* Navbar */}
+        {/* Navbar — always visible */}
         <nav style={{
           position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
           padding: '0 48px', height: '64px',
@@ -47,16 +69,23 @@ export default function App() {
           <span style={{ fontSize: '18px', fontWeight: 300, color: '#f8fafc', letterSpacing: '0.05em' }}>
             <span style={{ color: '#06b6d4', fontWeight: 700 }}>S</span> Sensoris
           </span>
-          <a href="mailto:hello@sensoris.ai" style={{
-            padding: '8px 20px', border: '1px solid rgba(255,255,255,0.15)',
-            borderRadius: '4px', color: '#f8fafc', fontSize: '13px',
-            textDecoration: 'none', pointerEvents: 'all',
-          }}>
+          <a
+            href="mailto:hello@sensoris.ai"
+            style={{
+              padding: '8px 20px',
+              border: '1px solid rgba(255,255,255,0.15)',
+              borderRadius: '4px',
+              color: '#f8fafc',
+              fontSize: '13px',
+              textDecoration: 'none',
+              pointerEvents: 'all',
+            }}
+          >
             Request Demo
           </a>
         </nav>
 
-        {/* 1 — Hero */}
+        {/* Section 1 — Hero */}
         <div style={{ height: '100vh' }}>
           <div className="overlay center">
             <span className="eyebrow">PHYSICAL AI FOR FACTORIES</span>
@@ -72,7 +101,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* 2 — Problem */}
+        {/* Section 2 — Problem */}
         <div style={{ height: '100vh' }}>
           <div className="overlay left">
             <span className="stat orange">$167B</span>
@@ -89,17 +118,19 @@ export default function App() {
           </div>
         </div>
 
-        {/* 3 — SafetyEye */}
+        {/* Section 3 — SafetyEye */}
         <div style={{ height: '100vh' }}>
           <div className="overlay right">
             <span className="product-name">SafetyEye</span>
-            <p className="tagline">The camera is already there.<br />It just wasn't watching.</p>
+            <p className="tagline">
+              The camera is already there.<br />It just wasn't watching.
+            </p>
             <ul className="micro">PPE · Restricted zones · Unsafe postures · OSHA reports</ul>
             <span className="fact">Zero new hardware. Live in under an hour.</span>
           </div>
         </div>
 
-        {/* 4 — MachineWhisperer */}
+        {/* Section 4 — MachineWhisperer */}
         <div style={{ height: '100vh' }}>
           <div className="overlay left">
             <span className="product-name">MachineWhisperer</span>
@@ -114,7 +145,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* 5 — Stats */}
+        {/* Section 5 — Stats */}
         <div style={{ height: '100vh' }}>
           <div className="overlay center">
             <div className="stats-row">
@@ -135,13 +166,24 @@ export default function App() {
           </div>
         </div>
 
-        {/* 6 — CTA */}
+        {/* Section 6 — CTA */}
         <div style={{ height: '100vh' }}>
           <div className="overlay center">
-            <h2 style={{ fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 900, color: '#f8fafc', lineHeight: 1.1 }}>
+            <h2 style={{
+              fontSize: 'clamp(32px, 5vw, 56px)',
+              fontWeight: 900,
+              color: '#f8fafc',
+              lineHeight: 1.1,
+            }}>
               Your factory is already talking.
             </h2>
-            <h2 style={{ fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 900, color: '#06b6d4', lineHeight: 1.1, marginTop: '8px' }}>
+            <h2 style={{
+              fontSize: 'clamp(32px, 5vw, 56px)',
+              fontWeight: 900,
+              color: '#06b6d4',
+              lineHeight: 1.1,
+              marginTop: '8px',
+            }}>
               You just can't hear it yet.
             </h2>
             <a className="cta-btn" href="mailto:hello@sensoris.ai">
